@@ -15,18 +15,35 @@ st.set_page_config(
 st.markdown("""
 <style>
     .stApp {
-        background-color: #f8f9fa;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
     .main-header {
         text-align: center;
-        padding: 2rem 0;
+        padding: 3rem 0;
+        color: white;
+    }
+    .main-header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    .main-header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
     }
     .restaurant-card {
         background: white;
-        padding: 1.5rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 1rem;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        transition: transform 0.2s;
+    }
+    .restaurant-card:hover {
+        transform: translateY(-5px);
+    }
+    div[data-testid="stVerticalBlock"] > div[data-testid="stVerticalBlock"] {
+        padding-top: 2rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -47,16 +64,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Check backend health
-with st.spinner("Checking backend status..."):
-    st.session_state.backend_healthy = check_backend_health()
-
-# Display health status
-st.subheader("System Status")
-render_health_status(st.session_state.backend_healthy)
-
-if not st.session_state.backend_healthy:
-    st.warning("Backend API is not responding. Some features may not work properly.")
 
 # Main content area
 col1, col2 = st.columns([1, 3])
@@ -92,27 +99,6 @@ with col2:
         render_results(st.session_state.results)
     else:
         st.info("👈 Select your preferences and click 'Find Restaurants' to get recommendations")
-        
-        # Show example
-        st.markdown("---")
-        st.subheader("How it works")
-        st.markdown("""
-        1. **Select Location**: Choose your preferred area
-        2. **Choose Cuisine**: Pick your favorite cuisine type
-        3. **Set Budget**: Specify your budget range
-        4. **Add Preferences**: Select optional preferences like quick service, family-friendly, etc.
-        5. **Get Recommendations**: Our AI will find the best restaurants for you
-        """)
-        
-        # Features
-        st.subheader("Features")
-        st.markdown("""
-        - 🤖 **AI-Powered**: Uses advanced LLM for intelligent ranking
-        - 🎯 **Personalized**: Recommendations based on your specific preferences
-        - ⚡ **Fast**: Quick response times with caching
-        - 📊 **Explainable**: Get explanations for why each restaurant was recommended
-        - 🔄 **Flexible**: Relaxation strategies when exact matches aren't found
-        """)
 
 # Footer
 st.markdown("---")

@@ -12,7 +12,7 @@ def render_preference_form() -> Dict[str, Any]:
     """
     preferences = {}
     
-    st.header("Your Preferences")
+    st.markdown("### 🎯 Your Preferences")
     
     # Location
     locations = get_unique_locations()
@@ -93,32 +93,47 @@ def render_restaurant_card(restaurant: Dict[str, Any], rank: int) -> None:
         rank: Rank of the restaurant
     """
     with st.container():
-        col1, col2 = st.columns([3, 1])
+        # Rank badge
+        rank_colors = ["🥇", "🥈", "🥉"]
+        rank_emoji = rank_colors[rank-1] if rank <= 3 else f"#{rank}"
         
+        st.markdown(f"""
+        <div style="background: white; padding: 1.5rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 style="margin: 0; color: #333; font-size: 1.5rem;">{rank_emoji} {restaurant['name']}</h2>
+                <span style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: bold;">Rank {rank}</span>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Location
+        st.markdown(f"📍 **{restaurant['location']}**")
+        
+        # Cuisines
+        cuisines = restaurant.get('cuisines', [])
+        if cuisines:
+            cuisine_tags = " · ".join(cuisines[:5])
+            st.markdown(f"🍽️ {cuisine_tags}")
+        
+        # Rating and cost in columns
+        col1, col2 = st.columns(2)
         with col1:
-            st.markdown(f"### #{rank} {restaurant['name']}")
-            st.markdown(f"**Location:** {restaurant['location']}")
-            
-            # Cuisines
-            cuisines = restaurant.get('cuisines', [])
-            if cuisines:
-                cuisine_tags = " ".join([f"`{c}`" for c in cuisines[:5]])
-                st.markdown(f"**Cuisines:** {cuisine_tags}")
-            
-            # Rating and cost
             rating = restaurant.get('rating', 'N/A')
-            cost = restaurant.get('cost_for_two', 'N/A')
-            st.markdown(f"**Rating:** ⭐ {rating} | **Cost for Two:** {format_currency(cost) if cost != 'N/A' else cost}")
-        
+            st.markdown(f"⭐ **{rating}**")
         with col2:
-            st.metric("Rank", rank)
+            cost = restaurant.get('cost_for_two', 'N/A')
+            st.markdown(f"💰 **{format_currency(cost) if cost != 'N/A' else cost}**")
         
         # Explanation
         explanation = restaurant.get('explanation')
         if explanation:
-            st.info(f"💡 {explanation}")
+            st.markdown(f"""
+            <div style="background: #f0f4ff; padding: 1rem; border-radius: 10px; margin-top: 1rem; border-left: 4px solid #667eea;">
+                <strong>💡 Why this restaurant?</strong><br>
+                {explanation}
+            </div>
+            """, unsafe_allow_html=True)
         
-        st.markdown("---")
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 def render_results(results: Dict[str, Any]) -> None:
