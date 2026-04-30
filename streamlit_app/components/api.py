@@ -2,7 +2,11 @@ import requests
 import streamlit as st
 from typing import Dict, Any, Optional
 
-API_URL = st.secrets.get("API_URL", "http://localhost:8000")
+# Allow API URL to be overridden via session state for testing
+if "api_url" not in st.session_state:
+    st.session_state.api_url = st.secrets.get("API_URL", "http://localhost:8000")
+
+API_URL = st.session_state.api_url
 
 
 def get_recommendations(preferences: Dict[str, Any], top_n: int = 5) -> Optional[Dict[str, Any]]:

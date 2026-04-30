@@ -55,6 +55,8 @@ if 'results' not in st.session_state:
     st.session_state.results = None
 if 'backend_healthy' not in st.session_state:
     st.session_state.backend_healthy = None
+if 'api_url' not in st.session_state:
+    st.session_state.api_url = "http://localhost:8000"
 
 # Main header
 st.markdown("""
@@ -63,6 +65,20 @@ st.markdown("""
     <p>Find the perfect restaurant based on your preferences using AI-powered recommendations</p>
 </div>
 """, unsafe_allow_html=True)
+
+# API Configuration (collapsible)
+with st.expander("⚙️ API Configuration"):
+    api_url = st.text_input("Backend API URL", value=st.session_state.api_url, help="URL of the FastAPI backend")
+    st.session_state.api_url = api_url
+    
+    # Test connection button
+    if st.button("Test Connection"):
+        from components.api import check_backend_health
+        with st.spinner("Testing connection..."):
+            if check_backend_health():
+                st.success("✅ Backend is reachable!")
+            else:
+                st.error("❌ Cannot connect to backend. Please check the URL and ensure the API is running.")
 
 
 # Main content area
