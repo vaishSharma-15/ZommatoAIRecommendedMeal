@@ -161,12 +161,6 @@ def render_results(results: Dict[str, Any]) -> None:
     for idx, item in enumerate(recommendations, 1):
         restaurant = item.get('restaurant', {})
         render_restaurant_card(restaurant, idx)
-    
-    # Export option
-    if recommendations:
-        from .utils import export_to_csv
-        st.subheader("Export Results")
-        export_to_csv(recommendations)
 
 
 def render_health_status(healthy: bool) -> None:
