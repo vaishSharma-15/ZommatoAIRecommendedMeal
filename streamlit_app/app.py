@@ -15,35 +15,36 @@ st.set_page_config(
 st.markdown("""
 <style>
     .stApp {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-color: #f8f9fa;
     }
     .main-header {
         text-align: center;
-        padding: 3rem 0;
-        color: white;
+        padding: 2rem 0;
+        color: #333;
     }
     .main-header h1 {
-        font-size: 3rem;
+        font-size: 2.5rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
+        color: #667eea;
     }
     .main-header p {
-        font-size: 1.2rem;
-        opacity: 0.9;
+        font-size: 1.1rem;
+        color: #666;
     }
     .restaurant-card {
         background: white;
-        padding: 2rem;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
-        transition: transform 0.2s;
+        padding: 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+        border: 1px solid #e0e0e0;
     }
     .restaurant-card:hover {
-        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     div[data-testid="stVerticalBlock"] > div[data-testid="stVerticalBlock"] {
-        padding-top: 2rem;
+        padding-top: 1rem;
     }
 </style>
 """, unsafe_allow_html=True)
