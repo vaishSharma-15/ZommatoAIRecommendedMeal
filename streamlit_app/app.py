@@ -56,8 +56,6 @@ if 'results' not in st.session_state:
     st.session_state.results = None
 if 'backend_healthy' not in st.session_state:
     st.session_state.backend_healthy = None
-if 'api_url' not in st.session_state:
-    st.session_state.api_url = "http://localhost:8000"
 
 # Main header
 st.markdown("""

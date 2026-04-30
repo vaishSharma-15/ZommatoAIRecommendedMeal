@@ -89,7 +89,27 @@ streamlit_app/
 
 ## Environment Variables
 
-- `API_URL`: The URL of the FastAPI backend (default: `http://localhost:8000`)
+The app requires the following environment variable to be configured in Streamlit Cloud:
+
+- `API_URL`: URL of the FastAPI backend (default: `http://localhost:8000`)
+
+### For Local Development
+
+The app is configured to use `http://localhost:8000` by default. Ensure your FastAPI backend is running locally on port 8000.
+
+### For Deployment on Streamlit Cloud
+
+You need to set the `API_URL` in Streamlit Cloud secrets:
+
+1. Deploy your FastAPI backend to a cloud service (Render, Railway, AWS, etc.)
+2. Go to your Streamlit app's Settings
+3. Navigate to Secrets
+4. Add the environment variable in TOML format:
+```toml
+API_URL = "https://your-deployed-backend-url.com"
+```
+
+**Note:** The deployed Streamlit app cannot connect to `localhost:8000` because that refers to the local machine where the app is running, not your development machine.
 
 ## Usage
 
