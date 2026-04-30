@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zomoto AI - Restaurant Recommendations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .recommendation-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .recommendation-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-utensils text-3xl"></i>
+                        <h1 class="text-2xl font-bold">Zomoto AI</h1>
+                    </div>
+                    <p class="text-blue-100">AI-Powered Restaurant Recommendations</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Preference Form -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-6 text-gray-800">
+                    <i class="fas fa-search mr-2"></i>Find Your Perfect Restaurant
+                </h2>
+                
+                <form id="preferenceForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Location -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-map-marker-alt mr-1"></i>Location *
+                            </label>
+                            <input type="text" id="location" name="location" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="e.g., Bangalore, Delhi, Mumbai">
+                        </div>
+
+                        <!-- Budget -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-rupee-sign mr-1"></i>Maximum Budget (for two)
+                            </label>
+                            <input type="number" id="budget" name="budget" min="0" step="50"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="e.g., 1000">
+                        </div>
+
+                        <!-- Cuisine -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-hamburger mr-1"></i>Preferred Cuisine
+                            </label>
+                            <input type="text" id="cuisine" name="cuisine"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="e.g., Italian, Chinese, North Indian">
+                        </div>
+
+                        <!-- Minimum Rating -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-star mr-1"></i>Minimum Rating
+                            </label>
+                            <select id="minRating" name="minRating"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="0">Any Rating</option>
+                                <option value="3.0">3.0 ⭐ and above</option>
+                                <option value="3.5">3.5 ⭐ and above</option>
+                                <option value="4.0" selected>4.0 ⭐ and above</option>
+                                <option value="4.5">4.5 ⭐ and above</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Optional Constraints -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-list mr-1"></i>Specific Restaurant Names (optional)
+                        </label>
+                        <div id="restaurantNames" class="space-y-2">
+                            <div class="flex space-x-2">
+                                <input type="text" class="restaurant-name flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                       placeholder="Enter restaurant name">
+                                <button type="button" onclick="addRestaurantName()"
+                                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex justify-center">
+                        <button type="submit"
+                                class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition transform hover:scale-105">
+                            <i class="fas fa-search mr-2"></i>Get Recommendations
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="hidden bg-white rounded-lg shadow-md p-8 mb-8">
+                <div class="flex flex-col items-center justify-center space-y-4">
+                    <div class="loading-spinner"></div>
+                    <p class="text-gray-600">Finding perfect restaurants for you...</p>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="hidden">
+                <!-- Summary -->
+                <div id="summaryCard" class="bg-white rounded-lg shadow-md p-6 mb-8">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">
+                        <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>Summary
+                    </h3>
+                    <p id="summaryText" class="text-gray-600"></p>
+                </div>
+
+                <!-- Relaxation Steps -->
+                <div id="relaxationCard" class="bg-blue-50 rounded-lg shadow-md p-6 mb-8 hidden">
+                    <h3 class="text-lg font-semibold mb-3 text-blue-800">
+                        <i class="fas fa-info-circle mr-2"></i>Search Adjustments
+                    </h3>
+                    <ul id="relaxationSteps" class="space-y-1 text-blue-700"></ul>
+                </div>
+
+                <!-- Recommendations Grid -->
+                <div id="recommendationsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Recommendation cards will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="hidden bg-red-50 rounded-lg shadow-md p-8 mb-8">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold text-red-800">Error</h3>
+                        <p id="errorMessage" class="text-red-600"></p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-6 mt-12">
+            <div class="container mx-auto px-4 text-center">
+                <p class="text-gray-400">© 2024 Zomoto AI - Powered by Advanced Restaurant Recommendation Engine</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        let restaurantNames = [];
+
+        function addRestaurantName() {
+            const input = document.querySelector('.restaurant-name');
+            const name = input.value.trim();
+            
+            if (name && !restaurantNames.includes(name)) {
+                restaurantNames.push(name);
+                input.value = '';
+                updateRestaurantNamesDisplay();
+            }
+        }
+
+        function removeRestaurantName(index) {
+            restaurantNames.splice(index, 1);
+            updateRestaurantNamesDisplay();
+        }
+
+        function updateRestaurantNamesDisplay() {
+            const container = document.getElementById('restaurantNames');
+            const namesHtml = restaurantNames.map((name, index) => `
+                <div class="flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-lg">
+                    <span class="text-gray-700">${name}</span>
+                    <button type="button" onclick="removeRestaurantName(${index})"
+                            class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+            
+            container.innerHTML = `
+                <div class="space-y-2">
+                    ${namesHtml}
+                    <div class="flex space-x-2">
+                        <input type="text" class="restaurant-name flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Enter restaurant name">
+                        <button type="button" onclick="addRestaurantName()"
+                                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Handle form submission
+        document.getElementById('preferenceForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const preferences = {
+                location: formData.get('location'),
+                budget: formData.get('budget') ? parseInt(formData.get('budget')) : null,
+                cuisine: formData.get('cuisine') || null,
+                min_rating: parseFloat(formData.get('minRating')),
+                optional_constraints: restaurantNames
+            };
+
+            // Show loading state
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+
+            try {
+                const response = await fetch('/recommendations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        preferences: preferences,
+                        top_n: 12
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    displayResults(result);
+                } else {
+                    throw new Error(result.detail || 'Failed to get recommendations');
+                }
+            } catch (error) {
+                displayError(error.message);
+            } finally {
+                document.getElementById('loadingState').classList.add('hidden');
+            }
+        });
+
+        function displayResults(result) {
+            // Display summary
+            const summaryCard = document.getElementById('summaryCard');
+            const summaryText = document.getElementById('summaryText');
+            summaryText.textContent = result.summary || 'Here are your restaurant recommendations!';
+            summaryCard.classList.remove('hidden');
+
+            // Display relaxation steps if any
+            if (result.relaxation_steps && result.relaxation_steps.length > 0) {
+                const relaxationCard = document.getElementById('relaxationCard');
+                const relaxationSteps = document.getElementById('relaxationSteps');
+                relaxationSteps.innerHTML = result.relaxation_steps.map(step => 
+                    `<li><i class="fas fa-arrow-right mr-2"></i>${step.note}</li>`
+                ).join('');
+                relaxationCard.classList.remove('hidden');
+            }
+
+            // Display recommendations
+            const grid = document.getElementById('recommendationsGrid');
+            grid.innerHTML = result.recommendations.map(rec => createRecommendationCard(rec)).join('');
+
+            // Show results section
+            document.getElementById('resultsSection').classList.remove('hidden');
+        }
+
+        function createRecommendationCard(recommendation) {
+            const rating = recommendation.rating ? `${recommendation.rating.toFixed(1)} ⭐` : 'N/A';
+            const cost = recommendation.cost_for_two ? `₹${recommendation.cost_for_two}` : 'N/A';
+            const cuisines = recommendation.cuisines ? recommendation.cuisines.slice(0, 3).join(', ') : 'N/A';
+            
+            return `
+                <div class="recommendation-card bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800">${recommendation.restaurant_name || recommendation.restaurant_id}</h3>
+                        <span class="bg-blue-100 text-blue-800 text-sm font-medium px-2 py-1 rounded">
+                            #${recommendation.rank}
+                        </span>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            ${recommendation.location || 'Location not available'}
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-hamburger mr-2"></i>
+                            ${cuisines}
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">
+                                <i class="fas fa-rupee-sign mr-1"></i>${cost}
+                            </span>
+                            <span class="text-gray-600">
+                                ${rating}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <p class="text-sm text-gray-700 italic">${recommendation.explanation}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            document.getElementById('errorState').classList.remove('hidden');
+        }
+
+        // Add enter key support for restaurant name input
+        document.addEventListener('keypress', function(e) {
+            if (e.target.classList.contains('restaurant-name') && e.key === 'Enter') {
+                e.preventDefault();
+                addRestaurantName();
+            }
+        });
+    </script>
+</body>
+</html>
