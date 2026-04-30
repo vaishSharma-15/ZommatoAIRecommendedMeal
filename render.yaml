@@ -2,6 +2,7 @@ services:
   - type: web
     name: zomato-ai-backend
     env: python
+    runtime: python3.11
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: python -m src.zomoto_ai.backend start --port $PORT
     envVars:
@@ -12,3 +13,7 @@ services:
       - key: GROQ_BASE_URL
         value: https://api.groq.com/openai/v1/chat/completions
     healthCheckPath: /health
+    buildFilter:
+      paths:
+        - frontend
+      ignored: true
