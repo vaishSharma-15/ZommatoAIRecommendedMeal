@@ -68,11 +68,17 @@ st.markdown("""
 
 # API Configuration (collapsible)
 with st.expander("⚙️ API Configuration"):
-    api_url = st.text_input("Backend API URL", value=st.session_state.api_url, help="URL of the FastAPI backend")
-    st.session_state.api_url = api_url
+    api_url = st.text_input("Backend API URL", value=st.session_state.api_url, help="URL of the FastAPI backend", key="api_url_input")
+    
+    # Update session state when URL changes
+    if api_url != st.session_state.api_url:
+        st.session_state.api_url = api_url
+        st.rerun()
+    
+    st.caption(f"Current API URL: {st.session_state.api_url}")
     
     # Test connection button
-    if st.button("Test Connection"):
+    if st.button("Test Connection", key="test_conn"):
         from components.api import check_backend_health
         with st.spinner("Testing connection..."):
             if check_backend_health():

@@ -2,11 +2,12 @@ import requests
 import streamlit as st
 from typing import Dict, Any, Optional
 
-# Allow API URL to be overridden via session state for testing
-if "api_url" not in st.session_state:
-    st.session_state.api_url = st.secrets.get("API_URL", "http://localhost:8000")
 
-API_URL = st.session_state.api_url
+def get_api_url() -> str:
+    """Get the current API URL from session state or secrets."""
+    if "api_url" not in st.session_state:
+        st.session_state.api_url = st.secrets.get("API_URL", "http://localhost:8000")
+    return st.session_state.api_url
 
 
 def get_recommendations(preferences: Dict[str, Any], top_n: int = 5) -> Optional[Dict[str, Any]]:
@@ -20,9 +21,10 @@ def get_recommendations(preferences: Dict[str, Any], top_n: int = 5) -> Optional
     Returns:
         JSON response from API or None if error occurs
     """
+    api_url = get_api_url()
     try:
         response = requests.post(
-            f"{API_URL}/api/v1/recommendations",
+            f"{api_url}/api/v1/recommendations",
             json={
                 "preferences": preferences,
                 "top_n": top_n,
@@ -54,8 +56,9 @@ def check_backend_health() -> bool:
     Returns:
         True if backend is healthy, False otherwise
     """
+    api_url = get_api_url()
     try:
-        response = requests.get(f"{API_URL}/health", timeout=5)
+        response = requests.get(f"{api_url}/health", timeout=5)
         return response.status_code == 200
     except requests.exceptions.RequestException:
         return False
