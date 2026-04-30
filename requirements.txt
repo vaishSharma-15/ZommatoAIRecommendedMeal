@@ -1,7 +1,7 @@
 pydantic>=2.7,<3
 datasets>=2.19,<3
 pandas>=2.0,<3
-pyarrow>=15,<20
+pyarrow>=14.0.0,<15.0.0
 fastapi>=0.110,<1
 uvicorn>=0.27,<1
 python-multipart>=0.0.9,<1
